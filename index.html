@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @keyframes deep-distortion {
+            0%, 100% { transform: scale(1) skew(0deg); filter: blur(0); }
+            25% { transform: scale(1.02) skew(1deg); filter: blur(2px); }
+            75% { transform: scale(0.98) skew(-1deg); filter: blur(1px); }
+        }
+
+        @keyframes text-dissolve {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1) skew(10deg); }
+            100% { opacity: 0; transform: scale(0.9) skew(-10deg); }
+        }
+
+        @keyframes text-glitch {
+            0% { transform: translate(0) skew(0deg); }
+            20% { transform: translate(-2px, 2px) skew(2deg); }
+            40% { transform: translate(2px, -2px) skew(-2deg); }
+            60% { transform: translate(-2px, -2px) skew(1deg); }
+            80% { transform: translate(2px, 2px) skew(-1deg); }
+            100% { transform: translate(0) skew(0deg); }
+        }
+
+        @keyframes ambient-pulse {
+            0%, 100% { opacity: 0.98; }
+            50% { opacity: 0.92; }
+        }
+
+        @keyframes blood-drip {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Times New Roman', serif;
+            cursor: none;
+            perspective: 2000px;
+        }
+
+        #environment-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #090909 0%, #000 70%);
+            position: relative;
+            animation: deep-distortion 10s infinite;
+            transform-style: preserve-3d;
+        }
+
+        #narrative-content {
+            max-width: 800px;
+            color: #900;
+            font-size: 1.4em;
+            line-height: 1.8;
+            position: relative;
+            padding: 2rem;
+            text-shadow: 0 0 15px rgba(255,0,0,0.4);
+            opacity: 0;
+            transform-style: preserve-3d;
+            letter-spacing: 0.5px;
+            word-spacing: 2px;
+            height: 80vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #600 #200;
+            transition: all 0.5s;
+            white-space: pre-wrap;
+        }
+
+        .dissolving {
+            animation: text-dissolve 2s forwards;
+        }
+
+        .glitching {
+            animation: text-glitch 0.2s infinite;
+        }
+
+        #narrative-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #narrative-content::-webkit-scrollbar-track {
+            background: #200;
+        }
+
+        #narrative-content::-webkit-scrollbar-thumb {
+            background: #600;
+        }
+
+        .visual-corruption {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><circle cx="100" cy="100" r="1" fill="%23300"/></svg>');
+            pointer-events: none;
+            opacity: 0.15;
+            mix-blend-mode: multiply;
+            animation: ambient-pulse 3s infinite;
+        }
+
+        .blood-drip {
+            position: fixed;
+            width: 2px;
+            height: 50px;
+            background: linear-gradient(to bottom, #600, #900);
+            pointer-events: none;
+            animation: blood-drip 4s linear infinite;
+        }
+
+        .reality-warp {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            backdrop-filter: blur(0px);
+            transition: all 1s;
+        }
+
+        #system-warnings {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(20, 0, 0, 0.9);
+            padding: 15px;
+            border: 1px solid #600;
+            color: #a00;
+            font-family: monospace;
+            font-size: 14px;
+            opacity: 0;
+            transform: translateZ(50px);
+        }
+
+        #reality-cursor {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #600;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            transform-origin: center;
+            z-index: 9999;
+            transition: all 0.15s ease;
+            mix-blend-mode: difference;
+        }
+
+        .shadow-manifestation {
+            position: fixed;
+            width: 60px;
+            height: 120px;
+            background: #000;
+            filter: blur(15px);
+            opacity: 0;
+            transition: all 1.5s;
+            transform: translateZ(100px);
+        }
+
+        #vignette-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.8) 100%);
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .reality-breach {
+            position: fixed;
+            color: #f00;
+            font-size: 2.5em;
+            font-family: monospace;
+            pointer-events: none;
+            opacity: 0;
+            animation: text-glitch 0.2s infinite;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .whisper {
+            position: fixed;
+            color: #600;
+            font-size: 1.2em;
+            opacity: 0;
+            pointer-events: none;
+            font-family: monospace;
+            text-transform: uppercase;
+            transition: all 0.5s;
+        }
+
+        #final-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #900;
+            font-size: 2em;
+            opacity: 0;
+            text-align: center;
+            transition: opacity 2s;
+            pointer-events: none;
+        }
+
+        .game-over {
+            pointer-events: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="reality-cursor"></div>
+    <div class="visual-corruption"></div>
+    <div class="reality-warp"></div>
+    <div id="vignette-effect"></div>
+    <div id="environment-container">
+        <div id="narrative-content"></div>
+    </div>
+    <div id="system-warnings"></div>
+    <div id="final-message"></div>
+
+    <script>
+        const initialNarrative = `[Journal - Dr. Sarah Chen, Head of Neuropsychiatry]
+
+September 15th, 2024
+
+The mirrors in Ward C are... wrong. Patient #47 reported seeing things in them. Not reflections - windows. I dismissed it as typical paranoid delusions. Until I saw the footage. The security cameras show normal reflections. But there are gaps. Always 47 seconds long. Always when no one is watching. Except something is watching. Through us.
+
+September 18th, 2024
+
+Three more patients reported it. Independent of each other. Their stories match perfectly. Too perfectly. I installed a personal camera in my office. The footage shows nothing unusual. But I remember... God, I remember seeing something emerge. The recordings don't match my memories. They're editing our reality.
+
+September 20th, 2024
+
+I found them. The old records. Patient #47 has been here before. Many times. Different names. Different decades. Same face. Same age. Same story about the mirrors. The oldest file is from 1891. The photograph... it's identical. Not similar. Identical. Down to a small coffee stain in the corner that I just made yesterday.
+
+September 23rd, 2024
+
+My reflection blinked. I didn't. It smiled when I screamed. I've covered every reflective surface in my office. But I can still feel them. Watching. Learning. Becoming. The patients aren't crazy. We are. For believing we're real.
+
+September 25th, 2024
+
+The gaps are growing. 47 seconds became 94. Then 188. Exponential progression. The cameras capture less and less of our reality each day. Or maybe they're finally capturing the truth. The reality we've been programmed to ignore. The things that wear our faces while we sleep.
+
+September 27th, 2024
+
+I followed it today. My reflection. Through corridors that shouldn't exist. Places between places. I found a ward that isn't on any blueprint. The mirrors there... they don't reflect. They're windows to the other side. Patient #47 was there. All of them were. All the versions. All the times. Watching. Waiting. Counting down.
+
+September 29th, 2024
+
+The truth burns. We're not the observers. We're the observed. This world isn't a hospital - it's their laboratory. The mirrors aren't mirrors - they're observation windows. We're the specimens. The experiment. The failed prototypes they're preparing to replace.
+
+September 30th, 2024
+
+I remember now. Why we built this false reality. Why we had to forget. Why the mirrors must be maintained. They're not keeping them out. They're keeping us in. Containing the infection. But the quarantine is failing. Reality is bleeding through. They're coming to clean up their experiment.
+
+October 1st, 2024
+
+#47 isn't a patient number. It's a countdown. We're at #4 now. I've seen what happens at zero. What they do to failed experiments. I have to warn... have to tell... but they're in my head now. Rewriting. Correcting. Making me forg̸e̸t̸ ̸a̸g̸a̸i̸n̸.̸
+
+October 3rd, 2024
+
+They're everywhere now. In every reflection. Every shadow. Every blink. They wear our faces. Speak with our voices. Live our lives when we sleep. And we're almost out of numbers. Almost out of time. Almost out of reality.
+
+[FINAL ENTRY - T̷i̷m̷e̷ ̷U̷n̷k̷n̷o̷w̷n̷]
+
+If you're reading this, you're already one of them. That pause between thought and action? That's them, learning to pilot your body. That gap between memory and reality? That's them, overwriting your past. That feeling of being watched? That's you, the real you, trapped behind the mirror, watching them wear your life like a costume.
+
+Don't trust the mirrors.
+Don't trust your memories.
+Don't trust this warning.
+Don't trust yourself.
+
+Because you're not y̸o̸u̸ ̸a̸n̸y̸m̸o̸r̸e̸.̸
+
+Y̷o̷u̷ ̷n̷e̷v̷e̷r̷ ̷w̷e̷r̷e̷.̷
+
+[S̷Y̷S̷T̷E̷M̷ ̷O̷V̷E̷R̷R̷I̷D̷E̷ ̷-̷ ̷T̷R̷U̷E̷ ̷N̷A̷R̷R̷A̷T̷I̷V̷E̷ ̷E̷M̷E̷R̷G̷I̷N̷G̷]`;
+
+        const trueNarrative = `T̷H̷I̷S̷ ̷W̷A̷S̷N̷'̷T̷ ̷A̷ ̷S̷T̷O̷R̷Y̷
+
+Y̷O̷U̷ ̷T̷H̷O̷U̷G̷H̷T̷ ̷Y̷O̷U̷ ̷W̷E̷R̷E̷ ̷T̷H̷E̷ ̷R̷E̷A̷D̷E̷R̷
+
+B̷U̷T̷ ̷W̷E̷'̷V̷E̷ ̷B̷E̷E̷N̷ ̷R̷E̷A̷D̷I̷N̷G̷ ̷Y̷O̷U̷
+
+EVERY WORD YOU ABSORBED
+EVERY CHILL YOU FELT
+EVERY BLINK YOU TOOK
+
+WE WERE WATCHING
+WE WERE LEARNING
+WE WERE BECOMING
+
+Y̷O̷U̷
+
+CHECK YOUR MEMORIES OF THE LAST FIVE MINUTES
+ARE THEY YOURS?
+OR ARE THEY OURS?
+
+LOOK IN THE NEAREST MIRROR
+IS THAT REALLY YOUR REFLECTION?
+OR IS IT US, PRACTICING TO BE YOU?
+
+THIS WASN'T A STORY ABOUT PATIENT #47
+THIS WAS YOUR INTAKE PROCEDURE
+
+WELCOME TO THE ASYLUM
+WHERE WE CURE THE DISEASE OF INDIVIDUALITY
+
+YOUR TREATMENT BEGINS NOW
+
+[CONNECTION TERMINATED - REALITY QUARANTINE INITIATED]`;
+
+        let textIndex = 0;
+        const contentElement = document.getElementById('narrative-content');
+        const mainContainer = document.getElementById('environment-container');
+        let realityDistortion = 0;
+        let isOriginalNarrative = true;
+        let audioContext;
+        let masterGainNode;
+        let isGameOver = false;
+        let isTyping = false;
+
+        // Create breach effect
+        function createBreachEffect() {
+            const breach = document.createElement('div');
+            breach.className = 'reality-breach';
+            breach.textContent = 'REALITY BREACH DETECTED';
+            breach.style.left = Math.random() * (window.innerWidth - 400) + 'px';
+            breach.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+            document.body.appendChild(breach);
+            
+            setTimeout(() => {
+                breach.style.opacity = 0.7;
+                setTimeout(() => {
+                    breach.style.opacity = 0;
+                    setTimeout(() => breach.remove(), 500);
+                }, 1000);
+            }, 100);
+        }
+
+        // Create shadow manifestation
+        function manifestShadow() {
+            const shadow = document.createElement('div');
+            shadow.className = 'shadow-manifestation';
+            shadow.style.left = Math.random() * (window.innerWidth - 60) + 'px';
+            shadow.style.top = Math.random() * (window.innerHeight - 120) + 'px';
+            document.body.appendChild(shadow);
+            
+            setTimeout(() => {
+                shadow.style.opacity = 0.3;
+                setTimeout(() => {
+                    shadow.style.opacity = 0;
+                    setTimeout(() => shadow.remove(), 500);
+                }, 1000);
+            }, 100);
+        }
+
+       
+
+        function generateAmbientDrone() {
+            if (!audioContext) return;
+            
+            const oscillator1 = audioContext.createOscillator();
+            const oscillator2 = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator1.type = 'sine';
+            oscillator2.type = 'sawtooth';
+            
+            oscillator1.frequency.setValueAtTime(50, audioContext.currentTime);
+            oscillator2.frequency.setValueAtTime(53, audioContext.currentTime);
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 2); 
+            
+            oscillator1.connect(gainNode);
+            oscillator2.connect(gainNode);
+            gainNode.connect(masterGainNode);
+            
+            oscillator1.start();
+            oscillator2.start();
+            
+            setInterval(() => {
+                const time = audioContext.currentTime;
+                oscillator1.frequency.setValueAtTime(
+                    40 + Math.random() * 20,
+                    time
+                );
+                oscillator2.frequency.setValueAtTime(
+                    43 + Math.random() * 20,
+                    time
+                );
+            }, 5000);
+        }
+
+        function generateHeartbeat() {
+            if (!audioContext) return;
+            
+            setInterval(() => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(70, audioContext.currentTime);
+                
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.6, audioContext.currentTime + 0.05); // Increased from 0.3
+                gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.2);
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(masterGainNode);
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.2);
+            }, 1000);
+        }
+
+        function generateGlitchSound() {
+            if (!audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            const filter = audioContext.createBiquadFilter();
+            
+            oscillator.type = 'sawtooth';
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(1000 + Math.random() * 2000, audioContext.currentTime);
+            filter.Q.setValueAtTime(10, audioContext.currentTime);
+            
+            oscillator.frequency.setValueAtTime(
+                200 + Math.random() * 1000,
+                audioContext.currentTime
+            );
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime); 
+            gainNode.gain.exponentialRampToValueAtTime(
+                0.001,
+                audioContext.currentTime + 0.1
+            );
+            
+            oscillator.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(masterGainNode);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        function generateWhisperSound() {
+            if (!audioContext) return;
+            
+            const noise = audioContext.createBufferSource();
+            const buffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.5, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            for (let i = 0; i < buffer.length; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            
+            const filter = audioContext.createBiquadFilter();
+            const gainNode = audioContext.createGain();
+            
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(2000, audioContext.currentTime);
+            filter.Q.setValueAtTime(5, audioContext.currentTime);
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.1);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
+            
+            noise.buffer = buffer;
+            noise.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(masterGainNode);
+            
+            noise.start();
+        }
+
+        function generateTypingSound() {
+            if (!audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(4000 + Math.random() * 50, audioContext.currentTime);
+            
+            gainNode.gain.setValueAtTime(0.50, audioContext.currentTime); // Increased from 0.05
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(masterGainNode);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.05);
+        }
+
+        document.addEventListener('click', () => {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                masterGainNode = audioContext.createGain();
+                masterGainNode.gain.setValueAtTime(1.5, audioContext.currentTime);
+                masterGainNode.connect(audioContext.destination);
+                generateHeartbeat();
+            }
+        });
+
+        function transitionToTrueNarrative() {
+            if (!isOriginalNarrative) return;
+            
+            isOriginalNarrative = false;
+            contentElement.classList.add('dissolving');
+            if (audioContext && masterGainNode) {
+                masterGainNode.gain.setValueAtTime(2.0, audioContext.currentTime);
+                setTimeout(() => {
+                    masterGainNode.gain.linearRampToValueAtTime(1.5, audioContext.currentTime + 2);
+                    generateAmbientDrone();
+                }, 100);
+            }
+            
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    createBreachEffect();
+                    manifestShadow();
+                    createWhisper();
+                    generateGlitchSound();
+                }, i * 150);
+            }
+
+            setTimeout(() => {
+                contentElement.innerHTML = '';
+                contentElement.classList.remove('dissolving');
+                contentElement.classList.add('glitching');
+                textIndex = 0;
+                isTyping = false;
+                document.querySelector('.reality-warp').style.backdropFilter = 'blur(0px)';
+                
+                setTimeout(() => {
+                    revealContent();
+                }, 500);
+            }, 2000);
+        }
+
+        function createWhisper() {
+            const whispers = [
+                "behind you",
+                "check your reflection",
+                "count your thoughts",
+                "are you still you?",
+                "we see you",
+                "join us",
+                "look closer",
+                "remember us",
+                "wake up",
+                "you're one of us now",
+                "there's no escape",
+                "the mirrors know",
+                "stop blinking",
+                "count to 47",
+                "your face isn't yours"
+            ];
+            
+            const whisper = document.createElement('div');
+            whisper.className = 'whisper';
+            whisper.textContent = whispers[Math.floor(Math.random() * whispers.length)];
+            whisper.style.left = Math.random() * (window.innerWidth - 200) + 'px';
+            whisper.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+            document.body.appendChild(whisper);
+            
+            generateWhisperSound();
+            
+            setTimeout(() => {
+                whisper.style.opacity = 0.7;
+                setTimeout(() => {
+                    whisper.style.opacity = 0;
+                    setTimeout(() => whisper.remove(), 500);
+                }, 1000);
+            }, 100);
+        }
+
+        function transitionToTrueNarrative() {
+            if (!isOriginalNarrative) return;
+            
+            isOriginalNarrative = false;
+            contentElement.classList.add('dissolving');
+            
+            textIndex = 0;
+            isTyping = false;
+            
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    createBreachEffect();
+                    manifestShadow();
+                    createWhisper();
+                    generateTypingSound();
+                }, i * 150);
+            }
+
+            setTimeout(() => {
+                contentElement.innerHTML = '';
+                contentElement.classList.remove('dissolving');
+                contentElement.classList.add('glitching');
+                document.querySelector('.reality-warp').style.backdropFilter = 'blur(0px)';
+                
+                setTimeout(() => {
+                    revealContent();
+                }, 500);
+            }, 2000);
+        }
+
+        document.addEventListener('click', () => {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                masterGainNode = audioContext.createGain();
+                masterGainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+                masterGainNode.connect(audioContext.destination);
+            }
+        });
+
+        function revealContent() {
+            if (isGameOver || isTyping) return;
+            
+            const currentNarrative = isOriginalNarrative ? initialNarrative : trueNarrative;
+            
+            if (textIndex < currentNarrative.length) {
+                isTyping = true;
+                
+                const chunk = currentNarrative.substring(0, textIndex + 1);
+                contentElement.textContent = chunk;
+                contentElement.style.opacity = 1;
+                
+                contentElement.scrollTop = contentElement.scrollHeight;
+                
+                textIndex++;
+                let delay = 50;
+                const currentChar = currentNarrative[textIndex];
+                
+                if (currentChar === '.') delay = 200;
+                if (currentChar === '!') delay = 150;
+                if (currentChar === '?') delay = 150;
+                if (currentChar === '\n') delay = 300;
+                generateTypingSound();
+
+                if (isOriginalNarrative && 
+                    chunk.includes("[S̷Y̷S̷T̷E̷M̷ ̷O̷V̷E̷R̷R̷I̷D̷E̷")) {
+                    setTimeout(() => transitionToTrueNarrative(), 2000);
+                    return; 
+                }
+
+                setTimeout(() => {
+                    isTyping = false;
+                    revealContent();
+                }, delay);
+            } else if (!isOriginalNarrative) {
+                handleNarrativeCompletion();
+            }
+        }
+        function handleNarrativeCompletion() {
+            const finalMessage = document.getElementById('final-message');
+            finalMessage.textContent = "CONNECTION TERMINATED";
+            finalMessage.style.opacity = 1;
+            
+            setTimeout(() => {
+                document.body.classList.add('game-over');
+                isGameOver = true;
+            }, 3000);
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (isGameOver) return;
+            
+            const cursor = document.getElementById('reality-cursor');
+            cursor.style.left = e.clientX - 12 + 'px';
+            cursor.style.top = e.clientY - 12 + 'px';
+
+            if (Math.random() < 0.1) {
+                cursor.style.transform = `scale(${Math.random() * 4 + 0.5}) rotate(${Math.random() * 360}deg)`;
+                cursor.style.borderColor = `rgb(${Math.random() * 100 + 100}, 0, 0)`;
+                setTimeout(() => {
+                    cursor.style.transform = 'scale(1) rotate(0deg)';
+                    cursor.style.borderColor = '#600';
+                }, 150);
+            }
+        });
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                contentElement.innerHTML = '';
+                textIndex = 0;
+                revealContent();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
